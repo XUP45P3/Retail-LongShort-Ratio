@@ -78,6 +78,8 @@ function processData(oiRaw, priceRaw) {
     });
 
     const result = [];
+    const dayMap = ['(日)', '(一)', '(二)', '(三)', '(四)', '(五)', '(六)']; // 星期對照表
+
     oiRaw.forEach(row => {
         const date = row['Date'] ? row['Date'].trim() : null;
         if (date && priceMap.has(date)) {
@@ -92,8 +94,13 @@ function processData(oiRaw, priceRaw) {
             const retailShortRatio = (totalOI - instShortOI) / totalOI;
             const retailNetRatio = retailLongRatio - retailShortRatio;
 
+            // 計算星期幾
+            const dateObj = new Date(date);
+            const daySuffix = dayMap[dateObj.getUTCDay()]; 
+            const formattedDate = `${date} ${daySuffix}`;
+
             result.push({
-                date: date,
+                date: formattedDate,
                 price: price, 
                 retailLong: (retailLongRatio * 100).toFixed(2),
                 retailShort: (retailShortRatio * 100).toFixed(2),
@@ -101,7 +108,14 @@ function processData(oiRaw, priceRaw) {
             });
         }
     });
-    result.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 排序
+    result.sort((a, b) => {
+        const dateA = a.date.split(' ')[0];
+        const dateB = b.date.split(' ')[0];
+        return new Date(dateA) - new Date(dateB);
+    });
+
     return result;
 }
 
@@ -283,14 +297,14 @@ function calculateStrategyData(data) {
 }
 
 // -----------------------------------------------------
-// 計算權益曲線、MDD、Rolling Sharpe
+// 計算權益曲線、MDD(%)、Rolling Sharpe
 // -----------------------------------------------------
 function calculateEquityStats(data) {
     const FUND = 200000;
     const FEE = 200;  // 單邊手續費
     const SIZE = 50;  // 微台點值
     const LONG_PERCENT = 40;
-    const SHARPE_WINDOW = 60; // 修改：滾動 Sharpe 週期改為 60 日
+    const SHARPE_WINDOW = 60; // 滾動 Sharpe 週期為 60 日
 
     // 累積權益變數
     let equity = FUND;
@@ -310,12 +324,11 @@ function calculateEquityStats(data) {
     let dailyReturns = [];
 
     // 結果陣列
-    // 從第一筆資料開始填入，以解決索引不一致問題
     const dates = [data[0].date];
     const equityData = [FUND];
     const equityLongData = [FUND];
     const equityShortData = [FUND];
-    const mddData = [0];
+    const mddData = [0]; // 第一天 MDD% 為 0
     const sharpeData = [0]; // 第0天無 Sharpe
 
     // 迴圈從 1 開始
@@ -416,8 +429,12 @@ function calculateEquityStats(data) {
              equityShort += dailyPnL;
         }
 
+        // 計算 MDD (%)
         if (equity > maxEquity) maxEquity = equity;
-        const drawdown = equity - maxEquity; 
+        const drawdownAbs = equity - maxEquity; // 絕對金額 (負值)
+        
+        // 改為百分比計算: (Drawdown / Peak) * 100
+        const drawdownPercent = maxEquity !== 0 ? (drawdownAbs / maxEquity) * 100 : 0;
 
         // Sharpe
         const prevEquity = equity - dailyPnL;
@@ -439,7 +456,8 @@ function calculateEquityStats(data) {
         equityData.push(Math.round(equity));
         equityLongData.push(Math.round(equityLong));
         equityShortData.push(Math.round(equityShort));
-        mddData.push(Math.round(drawdown));
+        // 儲存 MDD 百分比 (保留兩位小數)
+        mddData.push(parseFloat(drawdownPercent.toFixed(2)));
         sharpeData.push(sharpe.toFixed(2));
     }
 
@@ -796,7 +814,12 @@ function renderEquityChart(stats) {
                     const item = dataMap[name];
                     if (!item) return '';
                     
-                    const displayVal = item.value.toLocaleString();
+                    let displayVal = Number(item.value).toLocaleString();
+                    if (name === 'MDD') {
+                        // MDD 顯示為百分比，保留小數點後兩位
+                        displayVal = Number(item.value).toFixed(2) + '%';
+                    }
+                    
                     const dot = `<span style="display:inline-block;margin-right:6px;border-radius:50%;width:10px;height:10px;background-color:${item.color};"></span>`;
                     
                     return `<div style="display:flex; justify-content:space-between; align-items:center; min-width:200px; margin-bottom:4px;">
@@ -863,7 +886,8 @@ function renderEquityChart(stats) {
                 gridIndex: 1, 
                 scale: true, 
                 splitLine: { show: true, lineStyle: { type: 'dashed' } },
-                axisLabel: { formatter: (val) => val.toLocaleString() } 
+                // MDD Y軸顯示百分比
+                axisLabel: { formatter: '{value}%' } 
             },
             { 
                 gridIndex: 2, 
