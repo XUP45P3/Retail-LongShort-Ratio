@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微台散戶多空比</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>微台散戶多空比 - 監控儀表板</h1>
+            <div class="status" id="status-msg">正在讀取數據...</div>
+        </header>
+        
+        <div class="chart-wrapper">
+            <div class="chart-box">
+                <div id="ohlc-info" class="ohlc-info"></div>
+                <div id="main-chart"></div>
+            </div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="chart-box" style="height: 550px;">
+                <div id="equity-chart" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h2>本週數據概覽 (最近 5 日)</h2>
+            <div class="table-responsive">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>收盤價</th>
+                            <th>漲跌</th>
+                            <th>散戶淨多空比</th>
+                            <th>偏多比率</th>
+                            <th>偏空比率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+:root {
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --border: #dcdcdc;
+    --table-header-bg: #f8f9fa;
+    --hover-bg: #f1f3f5;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-y: auto; 
+    font-size: 16px;
+}
+
+.dashboard-container {
+    padding: 15px 30px;
+    max-width: 1600px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    text-align: center;
+}
+
+h1 {
+    font-family: 'Noto Serif TC', 'Songti TC', serif; 
+    font-size: 2rem;
+    margin: 0 0 5px 0;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: 2px;
+}
+
+.status {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.chart-wrapper {
+    margin-bottom: 20px;
+}
+
+.chart-box {
+    width: 100%;
+    height: 600px; 
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    position: relative;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+#main-chart {
+    width: 100%;
+    height: 100%;
+}
+
+/* OHLC 資訊欄：透明無框 */
+.ohlc-info {
+    position: absolute;
+    top: 20px;      
+    left: 70px;     
+    z-index: 999;
+    pointer-events: none;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    gap: 15px;
+    background-color: transparent; 
+    border: none;
+    padding: 4px 0;
+    white-space: nowrap;
+    text-shadow: 
+        1px 1px 0 #fff, 
+        -1px 1px 0 #fff, 
+        1px -1px 0 #fff, 
+        -1px -1px 0 #fff;
+}
+
+.ohlc-item {
+    display: flex;
+    align-items: center;
+}
+.ohlc-label {
+    color: #555;
+    margin-right: 5px;
+    font-weight: normal;
+}
+
+/* 表格樣式 */
+.table-container {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.table-container h2 {
+    margin: 0 0 15px 0;
+    font-size: 1.2rem;
+    color: #2c3e50;
+    border-left: 5px solid #2c3e50;
+    padding-left: 10px;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background-color: var(--table-header-bg);
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
+}
+
+tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+.num-cell {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+}
