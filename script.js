@@ -763,9 +763,9 @@ function renderEquityChart(stats) {
         textStyle: { fontFamily: 'Microsoft JhengHei, sans-serif' },
         animation: false,
         title: [
-            { text: '權益曲線 (Equity)', left: 'center', top: '1%', textStyle: { fontSize: 14 } },
-            { text: '最大回撤 (MDD)', left: 'center', top: '51%', textStyle: { fontSize: 14 } },
-            { text: '滾動夏普比率 (Rolling Sharpe)', left: 'center', top: '76%', textStyle: { fontSize: 14 } }
+            { text: 'Equity', left: 'center', top: '1%', textStyle: { fontSize: 14 } },
+            { text: 'Max DrawDown', left: 'center', top: '51%', textStyle: { fontSize: 14 } },
+            { text: 'Rolling Sharpe', left: 'center', top: '76%', textStyle: { fontSize: 14 } }
         ],
         tooltip: {
             trigger: 'axis',
