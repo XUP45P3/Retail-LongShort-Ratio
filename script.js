@@ -78,7 +78,7 @@ function processData(oiRaw, priceRaw) {
     });
 
     const result = [];
-    const dayMap = ['(日)', '(一)', '(二)', '(三)', '(四)', '(五)', '(六)']; // 星期對照表
+    const dayMap = ['(日)', '(一)', '(二)', '(三)', '(四)', '(五)', '(六)']; 
 
     oiRaw.forEach(row => {
         const date = row['Date'] ? row['Date'].trim() : null;
@@ -871,9 +871,30 @@ function renderEquityChart(stats) {
             { left: '60', right: '40', top: '81%', height: '14%' }   
         ],
         xAxis: [
-            { type: 'category', data: dates, gridIndex: 0, axisLabel: { show: false }, axisTick: { show: false } },
-            { type: 'category', data: dates, gridIndex: 1, axisLabel: { show: false }, axisTick: { show: false } },
-            { type: 'category', data: dates, gridIndex: 2, axisLabel: { show: true }, axisTick: { show: true } }
+            { 
+                type: 'category', 
+                data: dates, 
+                gridIndex: 0, 
+                axisLabel: { show: false }, 
+                axisTick: { show: false },
+                axisPointer: { label: { show: false } }
+            },
+            { 
+                type: 'category', 
+                data: dates, 
+                gridIndex: 1, 
+                axisLabel: { show: false }, 
+                axisTick: { show: false },
+                axisPointer: { label: { show: false } }
+            },
+            { 
+                type: 'category', 
+                data: dates, 
+                gridIndex: 2, 
+                axisLabel: { show: true }, 
+                axisTick: { show: true },
+                axisPointer: { label: { show: true } }
+            }
         ],
         yAxis: [
             { 
