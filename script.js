@@ -15,6 +15,11 @@ const COLOR_DOWN = '#27ae60';  // 綠
 const COLOR_STOP_LOSS = '#ffffff'; // 白色圓點
 const COLOR_STOP_BORDER = '#000000'; // 圓點邊框(確保在淺色底可見)
 
+// SMA 顏色設定
+const COLOR_SMA8 = '#f39c12';  // 橘黃
+const COLOR_SMA21 = '#9b59b6'; // 紫色
+const COLOR_SMA55 = '#3498db'; // 藍色
+
 // 主程式進入點
 async function initDashboard() {
     try {
@@ -62,7 +67,7 @@ function fetchCsv(url) {
     });
 }
 
-// 資料處理與合併
+// 資料處理與合併 (新增 SMA 計算)
 function processData(oiRaw, priceRaw) {
     const priceMap = new Map();
     priceRaw.forEach(row => {
@@ -77,7 +82,7 @@ function processData(oiRaw, priceRaw) {
         }
     });
 
-    const result = [];
+    let result = [];
     const dayMap = ['(日)', '(一)', '(二)', '(三)', '(四)', '(五)', '(六)']; 
 
     oiRaw.forEach(row => {
@@ -115,6 +120,36 @@ function processData(oiRaw, priceRaw) {
         const dateB = b.date.split(' ')[0];
         return new Date(dateA) - new Date(dateB);
     });
+
+    // --- 計算 SMA ---
+    // 輔助函式
+    const calculateSMA = (data, period) => {
+        let sma = [];
+        for (let i = 0; i < data.length; i++) {
+            if (i < period - 1) {
+                sma.push(null); // 資料不足時補 null
+                continue;
+            }
+            let sum = 0;
+            for (let j = 0; j < period; j++) {
+                sum += data[i - j].price.close;
+            }
+            sma.push(sum / period);
+        }
+        return sma;
+    };
+
+    const sma8 = calculateSMA(result, 8);
+    const sma21 = calculateSMA(result, 21);
+    const sma55 = calculateSMA(result, 55);
+
+    // 將 SMA 合併回 result
+    result = result.map((item, index) => ({
+        ...item,
+        sma8: sma8[index],
+        sma21: sma21[index],
+        sma55: sma55[index]
+    }));
 
     return result;
 }
@@ -469,6 +504,11 @@ function renderChart(data, strategyData) {
     const dates = data.map(item => item.date);
     const kLineData = data.map(item => [item.price.open, item.price.close, item.price.low, item.price.high]);
     
+    // SMA 數據
+    const sma8Data = data.map(item => item.sma8);
+    const sma21Data = data.map(item => item.sma21);
+    const sma55Data = data.map(item => item.sma55);
+
     const retailLongData = data.map(item => item.retailLong);
     const retailShortData = data.map(item => item.retailShort);
     const retailNetData = data.map(item => item.retailNet);
@@ -623,6 +663,36 @@ function renderChart(data, strategyData) {
                 }
             },
             {
+                name: 'SMA8',
+                type: 'line',
+                data: sma8Data,
+                smooth: true,
+                xAxisIndex: 0,
+                yAxisIndex: 0,
+                symbol: 'none',
+                lineStyle: { width: 1.5, color: COLOR_SMA8 }
+            },
+            {
+                name: 'SMA21',
+                type: 'line',
+                data: sma21Data,
+                smooth: true,
+                xAxisIndex: 0,
+                yAxisIndex: 0,
+                symbol: 'none',
+                lineStyle: { width: 1.5, color: COLOR_SMA21 }
+            },
+            {
+                name: 'SMA55',
+                type: 'line',
+                data: sma55Data,
+                smooth: true,
+                xAxisIndex: 0,
+                yAxisIndex: 0,
+                symbol: 'none',
+                lineStyle: { width: 1.5, color: COLOR_SMA55 }
+            },
+            {
                 name: '移動停損',
                 type: 'scatter', 
                 symbol: 'circle',
@@ -724,12 +794,18 @@ function renderChart(data, strategyData) {
         const color = isUp ? COLOR_UP : COLOR_DOWN;
         const fmt = (num) => num.toLocaleString();
 
+        // 格式化 SMA 數值
+        const fmtSMA = (num) => num ? num.toFixed(0) : '-';
+
         ohlcInfoDom.innerHTML = `
             <span class="ohlc-item" style="color: #333; font-weight: bold; margin-right: 15px;">${item.date}</span>
             <span class="ohlc-item"><span class="ohlc-label">Open</span><span style="color:${color}">${fmt(p.open)}</span></span>
             <span class="ohlc-item"><span class="ohlc-label">High</span><span style="color:${color}">${fmt(p.high)}</span></span>
             <span class="ohlc-item"><span class="ohlc-label">Low</span><span style="color:${color}">${fmt(p.low)}</span></span>
             <span class="ohlc-item"><span class="ohlc-label">Close</span><span style="color:${color}">${fmt(p.close)}</span></span>
+            <span class="ohlc-item" style="margin-left:10px;"><span class="ohlc-label" style="color:${COLOR_SMA8}">MA8</span>${fmtSMA(item.sma8)}</span>
+            <span class="ohlc-item"><span class="ohlc-label" style="color:${COLOR_SMA21}">MA21</span>${fmtSMA(item.sma21)}</span>
+            <span class="ohlc-item"><span class="ohlc-label" style="color:${COLOR_SMA55}">MA55</span>${fmtSMA(item.sma55)}</span>
         `;
     }
 
